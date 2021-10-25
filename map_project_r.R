@@ -29,43 +29,76 @@ ui <- dashboardPage(
       tabItem(
         tabName = "m_osm",
         tags$style(type = 'text/css', '#earthq_osm {height: calc(100vh-150px) 
-                   !important')
+                   !important'),
+        leafletOutput('earthq_osm')
       )
     )
   )
 )
 
 server <- function(input, output, session){
-  data("quakes")
+  # data(quakes)
+  # 
+  # output$earthq_osm <- renderLeaflet({
+  #   pal <- colorNumeric("Blues", quakes$mag)
+  #   
+  #   leaflet(data = quakes) %>% addTiles(group = "OpenStreetMap") %>% 
+  #     
+  #     addProviderTiles(providers$Esri.WorldStreetMap, options = tileOptions(
+  #       minZoom = 1, maxZoom = 7), group = "Esri.WorldStreetMap") %>%
+  #     addProviderTiles(providers$Esri.WorldImagery, options = tileOptions(
+  #       minZoom = 7, maxZoom = 13), group = "Esri.WorldImagery") %>%
+  #     
+  #     addCircles(radius = 10^mag/10, weight = 1, color = ~pal(mag),
+  #                fillOpacity = 0.7, popup = ~as.character(mag),
+  #                label = ~as.character(mag), group = "Points") #%>%
+  #     
+  #     addLayersControl(
+  #       baseGroups = c("OpenStreetMap", "Esri.WorldStreetMap", "Esri.WorldImagery"),
+  #       overlayGroups = c("Markers"),
+  # 
+  #       options = layersControlOptions(collapsed = TRUE)
+  #     ) %>%
+  # 
+  #     addLegend(
+  #       position = "topright",
+  #       pal = pal,
+  #       values = ~mag,
+  #       group = "Points",
+  #       title = "Магнитуда землетрясений v1"
+  #     )
+  
+  data(quakes)
   
   output$earthq_osm <- renderLeaflet({
+    
     pal <- colorNumeric("Blues", quakes$mag)
     
-    leaflet(data = quakes) %>% addTiles(group = "OpenStreetMap") %>% 
+    leaflet(data = quakes) %>% addTiles(group = "OpenStreetMap") %>%
       
-      addProviderTiles(providers$Esri.WorldStreetMap, options = tileOptions(
-        minZoom = 1, maxZoom = 7), group = "Esri.WorldStreetMap") %>%
-      addProviderTiles(providers$Esri.WorldImagery, options = tileOptions(
-        minZoom = 7, maxZoom = 13), group = "Esri.WorldImagery") %>%
+      addProviderTiles(providers$Esri.WorldStreetMap, options = tileOptions(minZoom = 0, maxZoom = 7), group = "Esri.WorldStreetMap") %>%
       
-      addCircles(radius = 10^mag/10, weight = 1, color = ~pal(mag), 
-                 fillOpacity = 0.7, popup = ~as.character(mag), 
-                 label = ~as.character(mag), group = "Points") %>%
+      addProviderTiles(providers$Esri.WorldImagery, options = tileOptions(minZoom = 7, maxZoom = 13), group = "Esri.WorldImagery") %>%
+      
+      addCircles(radius = ~10^mag/10, weight = 1, color = ~pal(mag), fillColor = ~pal(mag), fillOpacity = 0.6, 
+                 popup = ~as.character(mag), label = ~as.character(mag), group = "Points") %>%
       
       addLayersControl(
         baseGroups = c("OpenStreetMap", "Esri.WorldStreetMap", "Esri.WorldImagery"),
-        overlayGroups = c("Markers"),
         
         options = layersControlOptions(collapsed = TRUE)
       ) %>%
+      
+      
       
       addLegend(
         position = "topright",
         pal = pal,
         values = ~mag,
         group = "Points",
-        title = "Магнитуда землетрясений v1"
+        title = "Магитуда землетрясений"
       )
   })
-  shinyApp(ui, server)
 }
+
+shinyApp(ui, server)
